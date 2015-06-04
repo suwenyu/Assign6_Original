@@ -9,13 +9,39 @@
   <link rel="stylesheet" href="css/css.css">
 
   <!--引入初始化 Parse 的 js 檔案-->
-  <script type="text/javascript" src="<!--引入初始化 Parse 的 js 檔案-->"></script>
+  
+  <script type="text/javascript" src="js/key.js"></script>
   <script  type="text/javascript">
     $(document).on('submit','#signUpForm',function(e){
-      console.log('signUp submit');
+      //console.log('signUp submit');
+      
+      e.preventDefault();
+      var user = new Parse.User();
+      user.set("username", $('#username').val());
+      user.set("email",    $('#email').val());
+      user.set("password", $('#password').val());
+      user.set("role",     $('input:radio[name=role]:checked').val());
+      // if($("#-1").prop("checked")){
+      //   user.set("role","student");
+      // }
+      // else {
+      //   user.set("role","teacher");
+      // }
+      // user.set("role",     $( "input:radio[name=role]:checked" ).val());
+      //user.set("role" , $('#role').val());
       /* 請閱讀完 html 後在這裡填入送出表單後需要執行的程式碼 */
         // 提示1 : 記得使用 preventDefault 方程 避免表單轉址
-
+      user.signUp(null,{
+          success : function(user){     // 註冊成功後會執行的 callback
+            console.log(user);
+            alert("使用者註冊成功");
+            window.location="index.html" ;
+          },
+          error : function(course,error){ // 註冊失敗後會執行的 callback
+            console.log(error) ;
+            alert(error.message);
+          }
+          });//endof signUp
       /* 結束*/
     });  //endof signUpBtn onSubmit
   </script>
