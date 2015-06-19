@@ -11,41 +11,45 @@
   <script src="//www.parsecdn.com/js/parse-1.4.2.min.js"></script>
   <!--引入初始化 Parse 的 js 檔案-->
   <script type="text/javascript" src="js/key.js"></script>
-  <script  type="text/javascript">
-    $(document).ready(function() {
+ <script  type="text/javascript">
+
+  $(document).ready(function() {
       var currentUser = Parse.User.current();
       if (currentUser) {
           Parse.User.logOut();
           console.log('logout current', Parse.User.current());
       }
     });
-    $(document).on('submit','#logInForm',function(e){
-      console.log('logIn submit');
+
+  $(document).on('submit','#logInForm',function(e){
       
       e.preventDefault();
+      console.log('logIn submit');
 
-      var username = $('#username').val() ;
-      var password = $('#password').val() ;
-      /* 請閱讀完 html 後在這裡填入送出表單後需要執行的程式碼 */
-        // 提示1 : 記得使用 preventDefault 方程 避免表單轉址
-        // 提示2 : 請在使用者登入成功後，自動幫助使用者簽到，
-        // 提示3 : 簽到成功後，要將畫面切換到 index 頁面
+      var username = $('#username').val();
+      var password = $('#password').val();
 
-      Parse.User.logIn( username , password , {
-      success: function(user) {
-        // 到 console 看看 Parse.User.current()  的東西
-        console.log("登入之後的 Parse.User.current()  : ", Parse.User.current()) ;
-        
+      console.log("登入之前的 Parse.User.current() :", Parse.User.current());
 
-        var attendant = Parse.Object.extend("attendant");
-        var attend = new attendant();
+      Parse.User.logIn(username, password, {
+       success: function(user) {
+          var current_User = Parse.User.current();
+          console.log('current user', current_User);
 
-        console.log(Parse.Object.extend("attendant"));
-        attend.set("username", Parse.User.current().get('username'));
-        attend.set("email" , Parse.User.current().get('email'));
-        attend.set ("role", Parse.User.current().get('role'));
-        attend.save(null, {
-                    success: function(attend) {
+          var attendent = Parse.Object.extend("attendent");
+          var query = new Parse.Query(attendent);
+          query.equalTo("username", current_User.get("username"));
+          
+          query.find({
+            success: function(result) {
+                  if (result.length == 0) {
+                  var attendent = Parse.Object.extend("attendent");
+                  var attender = new attendent();
+                  attender.set("username", current_User.get("username"));
+
+                  attender.set("role", current_User.get("role"));
+                  attender.save(null, {
+                    success: function(attender) {
                       console.log('signed');
                     },
                     
@@ -54,16 +58,33 @@
                       console.log('attend error', error.message);
                     }
                   });
+                  }
+              },
+              error: function(error) {
+                  alert(error.message);
+                  console.log('error', error.message);
+              }
 
+      });
+          alert('自動轉回首頁，簽到成功!');
+          window.location = 'index.html';
+          return null;
       },
-      error: function(user, error) {
-        console.log(error) ;
-        alert(error.message);
+
+      error:function(user,error){
+        console.log('login error',error);
+        alert('使用者名稱或密碼有誤');
       }
-    });//endof login
+   
+      });
+
+  
+      /* 請閱讀完 html 後在這裡填入送出表單後需要執行的程式碼 */
+        // 提示1 : 記得使用 preventDefault 方程 避免表單轉址
+        // 提示2 : 請在使用者登入成功後，自動幫助使用者簽到，
+        // 提示3 : 簽到成功後，要將畫面切換到 index 頁面
+
       /* 結束*/
-      alert('登入成功') ;
-        window.location = 'index.html' ;
     });//endof logInBtn onSubmit
   </script>
 </head>
