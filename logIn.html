@@ -45,9 +45,10 @@
                   if (result.length == 0) {
                   var attendent = Parse.Object.extend("attendent");
                   var attender = new attendent();
-                  attender.set("username", current_User.get("username"));
 
+                  attender.set("username", current_User.get("username"));
                   attender.set("role", current_User.get("role"));
+                  
                   attender.save(null, {
                     success: function(attender) {
                       console.log('signed');
